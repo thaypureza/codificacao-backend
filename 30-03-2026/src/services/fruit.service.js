@@ -23,6 +23,24 @@ class FruitService {
         return newFruit
     }
 
+    update(id, nome) {
+        const index = fruits.findIndex(f => f.id === parseInt(id));
+        if (index !== -1) {
+            fruits[index].nome = nome;
+            return fruits[index];
+        }
+        return null;
+    }
+    delete(id) {
+        const index = fruits.findIndex(f => f.id === parseInt(id));
+
+        if (index !== -1) {
+            const deletedFruit = fruits.splice(index, 1);
+            return deletedFruit[0]; 
+        }
+
+        return null;}
 }
+
 
 export const fruitService = new FruitService()

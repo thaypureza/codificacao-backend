@@ -29,7 +29,35 @@ route.get("/:id", (req, res) => {
         return res.status(404).json({ message: "Fruta não encontrada" })
     }
 
-    res.json(fruit)
+    res.json(fruit)})
+
+route.put("/:id", (req, res) => { 
+    const { id } = req.params 
+    const { nome } = req.body 
+
+    if (!nome) {
+        return res.status(400).json({ message: "O novo nome da fruta é obrigatório" })
+    }
+
+    const updatedFruit = fruitService.update(id, nome)
+
+    if (!updatedFruit) {
+        return res.status(404).json({ message: "Fruta não encontrada para atualizar" })
+    }
+
+    res.json(updatedFruit)
+})
+
+route.delete("/:id", (req, res) => {
+    const { id } = req.params
+    
+    const wasDeleted = fruitService.delete(id)
+
+    if (!wasDeleted) {
+        return res.status(404).json({ message: "Fruta não encontrada para remover" })
+    }
+
+    res.json({ message: "Fruta removida com sucesso" })
 })
 
 
