@@ -1,8 +1,12 @@
 import fs from "fs/promises";
 
 async function readFruits() {
-  const data = await fs.readFile("./fruits.json", "utf-8");
-  return JSON.parse(data);
+  try {
+    const data = await fs.readFile("./fruits.json", "utf-8");
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
 }
 
 async function writeFruits(fruits) {
@@ -19,7 +23,8 @@ async function getFruitById(id) {
   const fruit = fruits.find(item => item.id === Number(id));
 
   if (!fruit) {
-    console.log("Fruta não encontrada.");
+    console.log("Fruta não encontrada pelo ID.");
+    return null;
   }
 
   return fruit;
@@ -27,12 +32,20 @@ async function getFruitById(id) {
 
 async function getFruitByName(nome) {
   const fruits = await readFruits();
-  return fruits.find(
+
+  const fruit = fruits.find(
     item => item.nome.toLowerCase() === nome.toLowerCase()
   );
+
+  if (!fruit) {
+    console.log("Fruta não encontrada com esse nome.");
+    return null;
+  }
+
+  return fruit;
 }
 
-async function createFruit(nome) {
+async function createFruit(nome, cor, preco) {
   const fruits = await readFruits();
 
   const alreadyExists = fruits.some(
@@ -46,26 +59,48 @@ async function createFruit(nome) {
 
   const newFruit = {
     id: fruits.length > 0 ? fruits[fruits.length - 1].id + 1 : 1,
-    nome
+    nome,
+    cor,
+    preco
   };
 
   fruits.push(newFruit);
   await writeFruits(fruits);
 
+  console.log("Fruta criada com sucesso.");
   return newFruit;
 }
 
-async function updateFruit(id, novoNome) {
+async function updateFruit(id, novoNome, novaCor, novoPreco) {
   const fruits = await readFruits();
   const index = fruits.findIndex(item => item.id === Number(id));
 
   if (index === -1) {
+    console.log("Fruta não encontrada para atualização.");
     return null;
   }
 
-  fruits[index].nome = novoNome;
+  const alreadyExists = fruits.some(
+    item =>
+      item.nome.toLowerCase() === novoNome.toLowerCase() &&
+      item.id !== Number(id)
+  );
+
+  if (alreadyExists) {
+    console.log("Já existe outra fruta com esse nome.");
+    return null;
+  }
+
+  fruits[index] = {
+    ...fruits[index],
+    nome: novoNome,
+    cor: novaCor,
+    preco: novoPreco
+  };
+
   await writeFruits(fruits);
 
+  console.log("Fruta atualizada com sucesso.");
   return fruits[index];
 }
 
@@ -74,49 +109,50 @@ async function deleteFruit(id) {
   const index = fruits.findIndex(item => item.id === Number(id));
 
   if (index === -1) {
+    console.log("Fruta não encontrada para remoção.");
     return false;
   }
 
   fruits.splice(index, 1);
   await writeFruits(fruits);
 
+  console.log("Fruta removida com sucesso.");
   return true;
 }
 
 async function resetFruits() {
   const initialFruits = [
-    { id: 1, nome: "Melancia" },
-    { id: 2, nome: "Banana" },
-    { id: 3, nome: "Laranja" }
+    { id: 1, nome: "Kiwi", cor: "Verde", preco: 10.0 },
+    { id: 2, nome: "Framboesa", cor: "Vermelha", preco: 5.0 },
+    { id: 3, nome: "Tangerina", cor: "Laranja", preco: 6.5 }
   ];
 
   await writeFruits(initialFruits);
-  console.log("Arquivo de frutas resetado para o estado inicial.");
+  console.log("Arquivo resetado.");
 }
-
+ 
 async function main() {
+  await resetFruits();
+
   const allFruits = await getAllFruits();
-  console.log("Todas as frutas:");
   console.log(allFruits);
 
   const fruit = await getFruitById(1);
-  console.log("Buscar fruta por id:");
   console.log(fruit);
 
-  const createdFruit = await createFruit("Abacaxi");
-  console.log("Fruta criada:");
+  const byName = await getFruitByName("banana");
+  console.log(byName);
+
+  const createdFruit = await createFruit("Abacaxi", "Amarelo", 8.5);
   console.log(createdFruit);
 
-  const updatedFruit = await updateFruit(1, "Maçã Gala");
-  console.log("Fruta atualizada:");
+  const updatedFruit = await updateFruit(1, "Maçã Gala", "Vermelha", 9.0);
   console.log(updatedFruit);
 
   const deleted = await deleteFruit(3);
-  console.log("Fruta removida com sucesso?");
   console.log(deleted);
 
   const finalList = await getAllFruits();
-  console.log("Lista final:");
   console.log(finalList);
 }
 

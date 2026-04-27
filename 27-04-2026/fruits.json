@@ -3,24 +3,18 @@
     "id": 1,
     "nome": "Maçã Gala",
     "cor": "Vermelha",
-    "Preço": 3.99
+    "preco": 9
   },
   {
     "id": 2,
-    "nome": "Cereja",
+    "nome": "Framboesa",
     "cor": "Vermelha",
-    "Preço": 4.5
+    "preco": 5
   },
   {
     "id": 4,
-    "nome": "Banana",
-    "cor": "Amarela",
-    "Preço": 2.99
-  },
-  {
-    "id": 5,
     "nome": "Abacaxi",
-    "cor": "Amarela",
-    "Preço": 4.99
+    "cor": "Amarelo",
+    "preco": 8.5
   }
 ]
